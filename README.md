@@ -1,149 +1,158 @@
-# Minecraft Block Shuffle
+# Minecraft Block Shuffle Fabric
 
-> Fabric migration in progress: the `2.0.0-alpha` branch targets dedicated Fabric
-> servers on Minecraft 1.21.11. Fabric API is required. On a dedicated server,
-> clients do not need this mod; for an Open-to-LAN game, the hosting client must
-> install it because that client owns the integrated server.
+![Minecraft Block Shuffle Fabric](art/modrinth-icon.jpg)
 
-## Fabric 1.21.11 (alpha)
+An unofficial Fabric port of [MinecraftBlockShuffle](https://github.com/Matistan/MinecraftBlockShuffle), originally created by Matistan.
 
-Build with `./gradlew build`, then copy the remapped JAR from `build/libs/` and a
-compatible Fabric API JAR into the server's `mods/` directory. The server requires
-Java 21. Configuration is generated at
-`config/minecraft-block-shuffle.json` on first launch.
+Minecraft Block Shuffle is a multiplayer minigame where every participant receives a random target block and must stand on it before the round timer expires. This port targets Minecraft Java Edition 1.21.11 and works on dedicated Fabric servers and Open-to-LAN worlds.
 
-Implemented commands: `/blockshuffle add`, `remove`, `start`, `reset`, `skip`,
-`list`, `ban`, and `unban`. The current alpha exposes these commands to all players
-so they remain usable in integrated Open-to-LAN servers; configurable permissions
-will be restored after a Fabric-compatible permissions bridge is added.
+## Requirements
 
-Target blocks have three difficulty tiers. `easy` keeps to common overworld blocks,
-`normal` additionally permits ores, processed/decorative blocks and dimension-specific
-materials, while `hard` also permits rare and expensive survival-obtainable blocks.
-Use `/blockshuffle difficulty` to inspect the current tier and
-`/blockshuffle difficulty <easy|normal|hard>` to change it. The default is `normal`.
+- Minecraft Java Edition 1.21.11
+- Fabric Loader 0.18.1 or newer
+- Fabric API for Minecraft 1.21.11
+- Java 21
 
-Random round teleports support `off`, `shared`, and `separate` modes. The default
-is `shared`: all active players move to the same safe overworld location on rounds
-1, 4, 7, and so on. `separate` gives every player an independent location. Configure
-the interval and radius with `randomTeleportEveryRounds` and `randomTeleportRadius`
-in the JSON config, or switch mode using
-`/blockshuffle teleport <off|shared|separate>`.
+## Installation
 
-The original Spigot source remains under `src/main/java` as migration reference;
-the Fabric build compiles only `src/fabric/java`.
+### Dedicated server
 
----
+1. Install Fabric Loader for Minecraft 1.21.11.
+2. Copy Fabric API and the Block Shuffle JAR into the server's `mods` directory.
+3. Start the server.
 
-View on [Spigot](https://www.spigotmc.org/resources/block-shuffle.109009/) • 
-Inspired by [Dream](https://www.youtube.com/@dream) • 
-Download [here](https://github.com/Matistan/MinecraftBlockShuffle/releases)
+Joining players do not need to install the mod.
 
----
+### Open to LAN
 
-> **Having issues?** Feel free to report them on the [Issues tab](https://github.com/Matistan/MinecraftBlockShuffle/issues). I'll be glad to hear your opinion about the plugin as well as extra features you would like me to add!
+The hosting client must install Fabric API and the Block Shuffle JAR because it runs the integrated server. Other players can join without installing the mod.
 
-## Welcome to readme!
+## Starting a game
 
-Hi!
-I just want to thank you for your interest in this plugin.
-I put a lot of effort into this project, and I would really love someone to use it!
+With the default `playWithEveryone` setting, start immediately with:
 
-### Minecraft version
+```mcfunction
+/blockshuffle start
+```
 
-This plugin runs on a Minecraft version 1.16+.
+To select players manually, disable `playWithEveryone` in the configuration and run:
 
-## What is Block Shuffle?
+```mcfunction
+/blockshuffle add @a
+/blockshuffle start
+```
 
-Minecraft Block Shuffle is a very popular game due to a youtuber Dream. Every player has a task to stand on a randomized block on time.
-When everyone finds their block, the next round starts. You can play it either solo or with your friends.
+## Gameplay
 
-## Features
+Every active player receives a localized target block name. Standing on that block completes the round objective. The action bar shows the current round, target, remaining time, and score.
 
-- Ban your own blocks! Go to the `plugins/MinecraftBlockShuffle/disabled.yml` and add blocks that you want to ban (a list of all the blocks is at `plugins/MinecraftBlockShuffle/blocks.yml`)
-- Choose between 2 game modes:
-- - Play until 1 or 0 players are left in the game
-- - Play until a player has a certain number of points
+Two game modes are available:
 
-## Important notes
+- Elimination mode removes players who fail to reach their target.
+- Points mode awards points until a player reaches the configured winning score.
 
-In some Minecraft versions, the plugin can give you a block from a higher version to stand on. For example, if you're playing on 1.20.4,
-the plugin can give you blocks from 1.21.
+## Difficulty levels
 
-### So what to do in this situation?
+```mcfunction
+/blockshuffle difficulty
+/blockshuffle difficulty easy
+/blockshuffle difficulty normal
+/blockshuffle difficulty hard
+```
 
-The solution to this is play normally, but if the game gives you an impossible block (or just a really hard one),
-you can use the `/blockshuffle ban <block_name>` command to ban the block, and then type `/blockshuffle skip` to skip the round (no points will be added).
+- `easy` focuses on common Overworld blocks.
+- `normal` adds ores, processed materials, decorative blocks, and dimension-specific materials.
+- `hard` also permits rare and expensive survival-obtainable blocks.
 
-## How to use it
+The default difficulty is `normal`. Blocks manually added to the ban list remain excluded at every difficulty.
 
-- drag the .jar file from the [Release tab](https://github.com/Matistan/MinecraftBlockShuffle/releases) to your plugins folder on your server.
-- type `/blockshuffle start` to start the match!
-- if you don't want to play with every player on the server, change the rule `playWithEveryone` to false, and choose the players using `/blockshuffle add` command
+## Random teleportation
+
+```mcfunction
+/blockshuffle teleport
+/blockshuffle teleport off
+/blockshuffle teleport shared
+/blockshuffle teleport separate
+```
+
+- `off` disables random teleportation.
+- `shared` teleports all active players to the same safe location.
+- `separate` gives every active player an independent destination.
+
+The default mode is `shared`. It triggers on rounds 1, 4, 7, and so on. Destinations are limited to safe Overworld ground inside the world border, and players receive brief damage protection after teleporting.
 
 ## Commands
 
-- `/blockshuffle add <player> <player> ... ` - adds players
-- `/blockshuffle add @a` - adds all players
-- `/blockshuffle remove <player> <player> ... ` - removes players
-- `/blockshuffle remove @a` - removes all players
-- `/blockshuffle start` - starts a game
-- `/blockshuffle reset` - resets a game
-- `/blockshuffle list` - shows a list of players in a block shuffle game
-- `/blockshuffle skip` - skips a round (e.g. when someone got an impossible block)
-- `/blockshuffle ban <block>` - bans a block
-- `/blockshuffle unban <block>` - unbans a block
-- `/blockshuffle rules <rule> value(optional)` - changes some additional rules of the game (in config.yml)
-- `/blockshuffle help` - shows a list of block shuffle commands
+| Command | Purpose |
+| --- | --- |
+| `/blockshuffle add <players>` | Add one or more players |
+| `/blockshuffle remove <players>` | Remove one or more players |
+| `/blockshuffle start` | Start a match |
+| `/blockshuffle reset` | Stop and reset the match |
+| `/blockshuffle skip` | Skip the current round |
+| `/blockshuffle list` | Show selected players and scores |
+| `/blockshuffle difficulty <easy\|normal\|hard>` | Select the target block difficulty |
+| `/blockshuffle teleport <off\|shared\|separate>` | Select the random teleport mode |
+| `/blockshuffle ban <block>` | Exclude a block from target selection |
+| `/blockshuffle unban <block>` | Remove a block from the ban list |
 
-## Configuration Options
+The current alpha exposes commands to all players so they work reliably in integrated Open-to-LAN servers. Granular permission integration is planned for a later release.
 
-Use the command `/blockshuffle rules` or edit the `plugins/MinecraftBlockShuffle/config.yml` file to change the following options:
+## Configuration
 
-### Main Options
+The first launch generates:
 
-| Key                  | Description                                                                                                     | Type    | recommended                                                             |
-|----------------------|-----------------------------------------------------------------------------------------------------------------|---------|-------------------------------------------------------------------------|
-| timeSetDayOnStart    | Set to true to set the time to day automatically when the game starts.                                          | boolean | true                                                                    |
-| weatherClearOnStart  | Set to true to set the weather to clear automatically when the game starts.                                     | boolean | true                                                                    |
-| playWithEveryone     | Set to true to not have to use '/blockshuffle add' every time, and instead play with every player on the server | boolean | true                                                                    |
-| enableNetherBlocks   | Set to true to enable nether blocks.                                                                            | boolean | false; if you choose true, then I recommend increasing time for a round |
-| takeAwayOps          | Set to true to take away OPs for the duration of the game.                                                      | boolean | true                                                                    |
-| clearInventories     | Set to true to clear players inventories when the game starts.                                                  | boolean | true                                                                    |
-| time                 | Set the time for a round in seconds (60sec - 3600sec).                                                          | int     | 300                                                                     |
-| sameBlockForEveryone | Set to true to make it so that every player has the same block to stand on.                                     | boolean | false; true for less RNG                                                |
-| pvpEnabled           | Set to true to enable PvP during the match.                                                                     | boolean | false                                                                   |
-| scoreboard           | Set to true to show scoreboard with the timer.                                                                  | boolean | true                                                                    |
-| usePermissions       | Set to true to require users to have permission to use certain commands.                                        | boolean | true; false if you trust the people you're playing with                 |
+```text
+config/minecraft-block-shuffle.json
+```
 
-### Game Mode Options
+Important options include:
 
-| Key         | Description                                                                                                                    | Type | recommended     |
-|-------------|--------------------------------------------------------------------------------------------------------------------------------|------|-----------------|
-| gameMode    | Set to 0 to play until there is 1 or 0 players left in a game, set to 1 to play until a player has a certain amount of points. | int  | It's up to you! |
-| pointsToWin | Set the number of point required to win (only if you're playing game mode 1).                                                  | int  | 5               |
+| Option | Default | Description |
+| --- | --- | --- |
+| `roundSeconds` | `300` | Time available per round |
+| `gameMode` | `1` | `0` for elimination, `1` for points |
+| `pointsToWin` | `5` | Winning score in points mode |
+| `difficulty` | `normal` | Target block difficulty |
+| `playWithEveryone` | `true` | Automatically include every online player |
+| `sameBlockForEveryone` | `false` | Give everyone the same target block |
+| `enableNetherBlocks` | `false` | Include Nether-related blocks |
+| `randomTeleportMode` | `shared` | `off`, `shared`, or `separate` |
+| `randomTeleportEveryRounds` | `3` | Number of rounds between teleports |
+| `randomTeleportRadius` | `500` | Maximum teleport distance from the current area |
+| `bannedBlocks` | built-in list | Blocks excluded from target selection |
 
-## Permissions
+Restart the game or server after editing the JSON file directly.
 
-If `usePermissions` is set to `true` in the `config.yml` file, players without ops will need the following permissions to use the commands:
+## Building from source
 
-| Permission                | Description                                                  |
-|---------------------------|--------------------------------------------------------------|
-| blockshuffle.blockshuffle | Allows the player to use all `/blockshuffle` commands.       |
-| blockshuffle.add          | Allows the player to use the `/blockshuffle add` command.    |
-| blockshuffle.remove       | Allows the player to use the `/blockshuffle remove` command. |
-| blockshuffle.start        | Allows the player to use the `/blockshuffle start` command.  |
-| blockshuffle.reset        | Allows the player to use the `/blockshuffle reset` command.  |
-| blockshuffle.list         | Allows the player to use the `/blockshuffle list` command.   |
-| blockshuffle.skip         | Allows the player to use the `/blockshuffle skip` command.   |
-| blockshuffle.ban          | Allows the player to use the `/blockshuffle ban` command.    |
-| blockshuffle.unban        | Allows the player to use the `/blockshuffle unban` command.  |
-| blockshuffle.rules        | Allows the player to use the `/blockshuffle rules` command.  |
-| blockshuffle.help         | Allows the player to use the `/blockshuffle help` command.   |
+```bash
+./gradlew build
+```
 
-### Bugs & Issues
+The remapped Fabric JAR is written to `build/libs/`.
 
-> **Having issues?** Feel free to report them on the [Issues tab](https://github.com/Matistan/MinecraftBlockShuffle/issues). I'll be glad to hear your opinion about the plugin as well as extra features you would like me to add!
+The original Spigot source remains under `src/main/java` as migration reference. The Fabric build compiles only `src/fabric/java`.
 
+## Alpha limitations
 
-Made by [Matistan](https://github.com/Matistan)
+- The original Bukkit scoreboard is currently replaced by action-bar information.
+- LuckPerms and granular permission-node integration are not yet available.
+- Difficulty does not yet increase automatically with the round number.
+- NeoForge is not supported yet.
+
+## Issues
+
+Report Fabric-port bugs and feature requests in the [HanLax93 fork issue tracker](https://github.com/HanLax93/MinecraftBlockShuffle/issues).
+
+Please report original Spigot plugin issues to the [upstream project](https://github.com/Matistan/MinecraftBlockShuffle).
+
+## Credits and license
+
+MinecraftBlockShuffle was originally created by [Matistan](https://github.com/Matistan). This repository contains an unofficial Fabric port maintained by HanLax93.
+
+The original project and this port are distributed under the [MIT License](LICENSE).
+
+```text
+Copyright (c) 2025 Matistan
+```
