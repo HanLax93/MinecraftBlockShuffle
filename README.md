@@ -1,5 +1,38 @@
 # Minecraft Block Shuffle
 
+> Fabric migration in progress: the `2.0.0-alpha` branch targets dedicated Fabric
+> servers on Minecraft 1.21.11. Fabric API is required. On a dedicated server,
+> clients do not need this mod; for an Open-to-LAN game, the hosting client must
+> install it because that client owns the integrated server.
+
+## Fabric 1.21.11 (alpha)
+
+Build with `./gradlew build`, then copy the remapped JAR from `build/libs/` and a
+compatible Fabric API JAR into the server's `mods/` directory. The server requires
+Java 21. Configuration is generated at
+`config/minecraft-block-shuffle.json` on first launch.
+
+Implemented commands: `/blockshuffle add`, `remove`, `start`, `reset`, `skip`,
+`list`, `ban`, and `unban`. The current alpha exposes these commands to all players
+so they remain usable in integrated Open-to-LAN servers; configurable permissions
+will be restored after a Fabric-compatible permissions bridge is added.
+
+Target blocks have three difficulty tiers. `easy` keeps to common overworld blocks,
+`normal` additionally permits ores, processed/decorative blocks and dimension-specific
+materials, while `hard` also permits rare and expensive survival-obtainable blocks.
+Use `/blockshuffle difficulty` to inspect the current tier and
+`/blockshuffle difficulty <easy|normal|hard>` to change it. The default is `normal`.
+
+Random round teleports support `off`, `shared`, and `separate` modes. The default
+is `shared`: all active players move to the same safe overworld location on rounds
+1, 4, 7, and so on. `separate` gives every player an independent location. Configure
+the interval and radius with `randomTeleportEveryRounds` and `randomTeleportRadius`
+in the JSON config, or switch mode using
+`/blockshuffle teleport <off|shared|separate>`.
+
+The original Spigot source remains under `src/main/java` as migration reference;
+the Fabric build compiles only `src/fabric/java`.
+
 ---
 
 View on [Spigot](https://www.spigotmc.org/resources/block-shuffle.109009/) • 

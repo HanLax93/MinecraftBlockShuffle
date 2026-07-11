@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "minecraftblockshuffle",
+  "version": "${version}",
+  "name": "Minecraft Block Shuffle",
+  "description": "Server-side Block Shuffle game for dedicated and integrated Fabric servers.",
+  "authors": ["Matistan05"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.matistan05.minecraftblockshuffle.fabric.BlockShuffleMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.1",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
