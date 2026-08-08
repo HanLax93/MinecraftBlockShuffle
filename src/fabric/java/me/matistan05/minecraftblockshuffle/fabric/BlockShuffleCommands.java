@@ -6,6 +6,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 
 final class BlockShuffleCommands {
     private BlockShuffleCommands() {}
@@ -13,6 +14,15 @@ final class BlockShuffleCommands {
     static void register(CommandDispatcher<CommandSourceStack> dispatcher, BlockShuffleGame game) {
         dispatcher.register(Commands.literal("blockshuffle")
             .then(Commands.literal("add")
+                .executes(context -> {
+                    ServerPlayer self = context.getSource().getPlayer();
+                    if (self == null) {
+                        throw new IllegalArgumentException("Specify at least one player when running from console");
+                    }
+                    game.add(self);
+                    context.getSource().sendSuccess(() -> Component.literal("Players added."), false);
+                    return 1;
+                })
                 .then(Commands.argument("players", EntityArgument.players()).executes(context -> {
                     for (var player : EntityArgument.getPlayers(context, "players")) game.add(player);
                     context.getSource().sendSuccess(() -> Component.literal("Players added."), false);
@@ -29,11 +39,35 @@ final class BlockShuffleCommands {
                 game.reset(context.getSource().getServer(), true);
                 return 1;
             }))
-            .then(Commands.literal("skip").executes(context -> run(context.getSource(), () -> game.skip(context.getSource().getServer()))))
+            .then(Commands.literal("skip").executes(context -> {
+                CommandSourceStack source = context.getSource();
+                var player = source.getPlayer();
+                if (player == null) return run(source, () -> game.skip(source.getServer()));
+                return run(source, () -> {
+                    Component result = game.voteSkip(source.getServer(), player);
+                    source.sendSuccess(() -> result, false);
+                });
+            }))
             .then(Commands.literal("list").executes(context -> {
                 context.getSource().sendSuccess(game::status, false);
                 return 1;
             }))
+            .then(Commands.literal("status").executes(context -> {
+                context.getSource().sendSuccess(game::status, false);
+                return 1;
+            }))
+            .then(Commands.literal("target")
+                .executes(context -> {
+                    var player = context.getSource().getPlayer();
+                    if (player == null) throw new IllegalArgumentException("Specify a player when running from the server console");
+                    context.getSource().sendSuccess(() -> game.target(player), false);
+                    return 1;
+                })
+                .then(Commands.argument("player", EntityArgument.player()).executes(context -> {
+                    var player = EntityArgument.getPlayer(context, "player");
+                    context.getSource().sendSuccess(() -> game.target(player), false);
+                    return 1;
+                })))
             .then(Commands.literal("difficulty")
                 .executes(context -> {
                     context.getSource().sendSuccess(() -> Component.literal("Difficulty: " + game.difficulty()), false);

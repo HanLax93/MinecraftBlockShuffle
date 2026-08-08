@@ -60,11 +60,11 @@ Two game modes are available:
 /blockshuffle difficulty hard
 ```
 
-- `easy` focuses on common Overworld blocks.
-- `normal` adds ores, processed materials, decorative blocks, and dimension-specific materials.
-- `hard` also permits rare and expensive survival-obtainable blocks.
+- `easy` only selects curated common Overworld blocks and short crafting chains.
+- `normal` starts with easy targets, introduces moderate targets from round 4, and hard targets after round 7.
+- `hard` accelerates that curve, introducing moderate targets from round 3 and hard targets after round 5.
 
-The default difficulty is `normal`. Blocks manually added to the ban list remain excluded at every difficulty.
+The target catalog contains only survival-obtainable, placeable blocks. Technical block states are never selected. The default difficulty is `normal`. Blocks manually added to the ban list remain excluded at every difficulty.
 
 ## Random teleportation
 
@@ -76,10 +76,10 @@ The default difficulty is `normal`. Blocks manually added to the ban list remain
 ```
 
 - `off` disables random teleportation.
-- `shared` teleports all active players to the same safe location.
+- `shared` teleports active players to safe nearby positions around one shared destination.
 - `separate` gives every active player an independent destination.
 
-The default mode is `shared`. It triggers on rounds 1, 4, 7, and so on. Destinations are limited to safe Overworld ground inside the world border, and players receive brief damage protection after teleporting.
+The default mode is `shared`. It triggers on rounds 1, 4, 7, and so on. Candidate destinations are scored for nearby target resources, remain inside the world border, and give players brief damage protection.
 
 ## Commands
 
@@ -89,8 +89,10 @@ The default mode is `shared`. It triggers on rounds 1, 4, 7, and so on. Destinat
 | `/blockshuffle remove <players>` | Remove one or more players |
 | `/blockshuffle start` | Start a match |
 | `/blockshuffle reset` | Stop and reset the match |
-| `/blockshuffle skip` | Skip the current round |
+| `/blockshuffle skip` | Vote to skip an unreachable target; a majority advances the round |
 | `/blockshuffle list` | Show selected players and scores |
+| `/blockshuffle status` | Show the round, remaining time, scores, and completion state |
+| `/blockshuffle target [player]` | Show the current target ID and remaining time |
 | `/blockshuffle difficulty <easy\|normal\|hard>` | Select the target block difficulty |
 | `/blockshuffle teleport <off\|shared\|separate>` | Select the random teleport mode |
 | `/blockshuffle ban <block>` | Exclude a block from target selection |
@@ -117,6 +119,8 @@ Important options include:
 | `playWithEveryone` | `true` | Automatically include every online player |
 | `sameBlockForEveryone` | `false` | Give everyone the same target block |
 | `enableNetherBlocks` | `false` | Include Nether-related blocks |
+| `enableEndBlocks` | `false` | Include End-related blocks |
+| `clearInventories` | `true` | Clear inventories once when a match starts |
 | `randomTeleportMode` | `shared` | `off`, `shared`, or `separate` |
 | `randomTeleportEveryRounds` | `3` | Number of rounds between teleports |
 | `randomTeleportRadius` | `500` | Maximum teleport distance from the current area |

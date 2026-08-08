@@ -26,6 +26,7 @@ public final class BlockShuffleConfig {
     public boolean playWithEveryone = true;
     public boolean sameBlockForEveryone = false;
     public boolean enableNetherBlocks = false;
+    public boolean enableEndBlocks = false;
     public boolean clearInventories = true;
     public boolean giveSpectators = true;
     public boolean onlyFirstPoint = false;
